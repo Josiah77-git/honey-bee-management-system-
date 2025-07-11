@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honey-Bee Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="Honey logo.jpeg" type="image/x-icon" sizes="450x450">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('bees.jpeg');
+            backdrop-filter: blur(15px);
+            background-size: cover;      
+            background-position: center;  
+            background-repeat: no-repeat; 
+            height: auto;                
+            margin: 0;                    
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4a700; /* yellow-700 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b88f00; /* darker yellow */
+        }
+
+        /* Header */
+        header {
+            background-color: #A16207; /* yellow-700 */
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+            margin: 1rem;
+            text-align: center;
+            position: relative; /* For positioning user menu */
+        }
+        header h1 {
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 700; /* font-bold */
+            letter-spacing: 0.025em; /* tracking-wide */
+            margin: 0;
+        }
+        @media (min-width: 640px) { /* sm: */
+            header h1 {
+                font-size: 2.5rem; /* sm:text-4xl */
+            }
+        }
+
+        /* User Profile Menu */
+        .user-profile-menu {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 20;
+        }
+        .user-profile-button {
+            background-color: #FBBF24; /* yellow-500 */
+            color: #78350F; /* yellow-900 */
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+        .user-profile-button:hover {
+            background-color: #D97706; /* yellow-600 */
+            color: white;
+            transform: scale(1.05);
+        }
+        .user-profile-dropdown {
+            position: absolute;
+            top: 50px; /* Adjust based on button height */
+            right: 0;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            min-width: 150px;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+        }
+        .user-profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .user-profile-dropdown button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            color: #333;
+            font-weight: 500;
+            transition: background-color 0.15s ease;
+        }
+        .user-profile-dropdown button:hover {
+            background-color: #FEF3C7; /* yellow-100 */
+        }
+        .user-profile-dropdown button:focus {
+            outline: none;
+            background-color: #FEF3C7; /* yellow-100 */
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem; /* gap-3 */
+            margin-bottom: 2rem;
+            margin-top: 1rem;
+        }
+        @media (min-width: 640px) { /* sm: */
+            nav {
+                gap: 1rem; /* sm:gap-4 */
+            }
+        }
+        nav button {
+            padding: 0.75rem 1rem; /* px-4 py-2 */
+            border-radius: 0.375rem; /* rounded-md */
+            transition: background-color 200ms, color 200ms, box-shadow 200ms; /* transition-colors duration-200 */
+            background-color: #FBBF24; /* yellow-500 */
+            backdrop-filter: blur (15px);
+            color: #78350F; /* yellow-900 */
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            outline: none;
+        }
+        nav button:hover {
+            background-color: #D97706; /* hover:bg-yellow-600 */
+            color: white; /* hover:text-white */
+        }
+        nav button.active {
+            background-color: #D97706; /* bg-yellow-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
+        }
+        nav button:focus {
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.5); /* focus:ring-2 focus:ring-yellow-700 focus:ring-opacity-50 */
+        }
+
+        /* Main Content Area */
+        main {
+            background-color: rgba(255, 255, 255 0.1);
+            border: 1px solid rgba(255, 255, 255 04);
+            padding: 1.5rem; /* p-6 */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* shadow-2xl */
+            max-width: 48rem; /* max-w-4xl */
+            margin: 0 auto 2rem auto; /* mx-auto mb-2rem */
+            flex-grow: 1; /* Allows main content to expand */
+        }
+        @media (min-width: 640px) { /* sm: */
+            main {
+                padding: 2rem; /* sm:p-8 */
+            }
+        }
+
+        /* Section Headings */
+        h2 {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 600; /* font-semibold */
+            color: #15c50c; /* yellow-800 */
+            margin-bottom: 1.5rem; /* mb-6 */
+            text-align: center;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 1rem; /* mb-4 */
+        }
+        .form-group label {
+            display: block;
+            color: #ffffff; /* gray-700 */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500; /* font-medium */
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select { /* Added select here */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+            border: 1px solid #ccc;
+            -webkit-appearance: none; /* appearance-none */
+            -moz-appearance: none;
+            appearance: none;
+            border: 1px solid #ef8307; 
+            background: rgba (255, 255, 255, 0.1);
+            backdrop-filter: blur(50px);
+            border-radius: 0.5rem; 
+            width: 100%; 
+            padding: 0.5rem 0.75rem; 
+            color: #4B5563; 
+            line-height: 1.25; 
+            outline: none;
+            transition: box-shadow 200ms, border-color 200ms; 
+            position: relative;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus { /* Added select here */
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.5); /* focus:ring-2 focus:ring-yellow-500 */
+            border-color: transparent; /* focus:border-transparent */
+        }
+        /* Specific styling for file input */
+        input[type="file"] {
+            padding: 0.6rem 0.75rem; /* adjust padding */
+            line-height: normal; /* ensure consistent height */
+        }
+
+        /* Submit Button */
+        .submit-button {
+            width: 100%; /* w-full */
+            background-color: #D97706; /* bg-yellow-600 */
+            color: white;
+            font-weight: 700; /* font-bold */
+            padding: 0.75rem 1rem; /* py-3 px-4 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            border: none;
+            cursor: pointer;
+            transition: background-color 300ms, box-shadow 300ms, transform 300ms; /* transition duration-300 ease-in-out */
+            outline: none;
+        }
+        .submit-button:hover {
+            background-color: #B45309; /* hover:bg-yellow-700 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* hover:shadow-lg */
+            transform: scale(1.02); /* hover:scale-105 */
+        }
+        .submit-button:focus {
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.75); /* focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-75 */
+        }
+
+        /* Home Section specific */
+        .home-section p {
+            font-size: 1.125rem; /* text-lg */
+            line-height: 1.75rem; /* leading-relaxed */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+        .home-section img {
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            margin: 1.5rem auto 0 auto; /* mx-auto mt-6 */
+            width: 100%; /* w-full */
+            max-width: 28rem; /* max-w-md */
+            height: auto; /* Ensure aspect ratio */
+        }
+
+        /* Receipts Section specific */
+        .receipts-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* grid-cols-1 */
+            gap: 1.5rem; /* gap-6 */
+        }
+        @media (min-width: 768px) { /* md: */
+            .receipts-grid {
+                grid-template-columns: repeat(2, 1fr); /* md:grid-cols-2 */
+            }
+        }
+        .receipt-card {
+            background-color: #FEF3C7; /* yellow-50 */
+            padding: 1.5rem; /* p-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            border: 1px solid #FDE68A; /* border border-yellow-200 */
+        }
+        .receipt-card h3 {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 700; /* font-bold */
+            color: #92400E; /* yellow-800 */
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+        .receipt-card p {
+            font-size: 0.875rem; /* text-sm */
+            color: #4B5563; /* text-gray-600 */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+        .receipt-card .details-section {
+            border-top: 1px solid #FCD34D; /* border-t border-yellow-300 */
+            padding-top: 1rem; /* pt-4 */
+            margin-top: 1rem; /* mt-4 */
+        }
+        .receipt-card .details-section p {
+            margin-bottom: 0.5rem;
+        }
+        .receipt-card .details-section .font-semibold {
+            font-weight: 600;
+        }
+        .receipt-card .details-section .total-amount {
+            font-weight: 700; /* font-bold */
+            font-size: 1.125rem; /* text-lg */
+            margin-top: 0.5rem; /* mt-2 */
+        }
+        .receipt-card .thank-you-note {
+            font-size: 0.75rem; /* text-xs */
+            color: #6B7280; /* text-gray-500 */
+            margin-top: 1rem; /* mt-4 */
+            text-align: right;
+        }
+
+        /* Hover Text with Tooltip */
+        .hover-tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+        .hover-tooltip-text {
+            color: #A16207; /* yellow-700 */
+            cursor: help;
+            border-bottom: 1px dashed #A16207; /* border-b border-dashed border-yellow-700 */
+            transition: color 200ms; /* transition-colors duration-200 */
+        }
+        .hover-tooltip-text:hover {
+            color: #78350F; /* hover:text-yellow-900 */
+        }
+        .tooltip-content {
+            position: absolute;
+            z-index: 10;
+            padding: 0.5rem; /* p-2 */
+            font-size: 0.875rem; /* text-sm */
+            color: rgb(white);
+            background-color: #374151; /* gray-800 */
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            bottom: 125%; /* Position above the text */
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap; /* Keep tooltip text on one line */
+            opacity: 0; /* Hidden by default */
+            visibility: hidden; /* Hidden by default */
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .hover-tooltip-container:hover .tooltip-content {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Utility classes (mimicking Tailwind for responsiveness in JS) */
+        .hidden { display: none; }
+        .block { display: block; }
+        .text-center { text-align: center; }
+
+        /* Login/Register Specific Styles */
+        .auth-toggle-button {
+            background: none;
+            border: none;
+            color: #A16207;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 1rem;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+        .auth-toggle-button:hover {
+            color: #78350F;
+        }
+
+        /* My Account Specific Styles */
+        .profile-picture-container {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .profile-picture {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #D97706;
+            margin: 0 auto 10px auto;
+            display: block;
+        }
+        .profile-username {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #92400E;
+            margin-bottom: 0.5rem;
+        }
+        .profile-email {
+            font-size: 1rem;
+            color: #6B7280;
+            margin-bottom: 1.5rem;
+        }
+        #profile-picture-upload-form button {
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            background-color: #FBBF24;
+            color: #78350F;
+            border-radius: 0.375rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #profile-picture-upload-form button:hover {
+            background-color: #D97706;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Honey-Bee Management System</h1>
+        <div class="user-profile-menu hidden" id="user-profile-menu">
+            <button class="user-profile-button" id="user-initials-btn">JD</button>
+            <div class="user-profile-dropdown" id="user-dropdown-content">
+                <button id="my-account-btn">My Account</button>
+                <button id="logout-btn">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <nav id="main-nav" class="hidden">
+        <button data-section="home" class="active">Home</button>
+        <button data-section="beehive-sales">Beehive Sales</button>
+        <button data-section="farmer-training">Farmer Training</button>
+        <button data-section="beehive-monitoring">Beehive Monitoring</button>
+        <button data-section="honey-sales">Honey Sales</button>
+        <button data-section="receipts">Electronic Receipts</button>
+    </nav>
+
+    <main>
+        <!-- Login/Register Section (Initially Visible) -->
+       <section id="login-register-section">
+    <h2 id="auth-heading" class="text-center">Login</h2>
+    <form id="auth-form">
+        <div class="form-group" id="name-group" style="display: none;">
+            <label for="auth-name">Name</label>
+            <input type="text" id="auth-name" name="name" placeholder="Your Full Name">
+        </div>
+        <div class="form-group">
+            <label for="auth-email">Email</label>
+            <input type="email" id="auth-email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+            <label for="auth-password">Password</label>
+            <input type="password" id="auth-password" name="password" placeholder="********" required>
+        </div>
+        <button type="submit" class="submit-button" id="auth-submit-btn">Login</button>
+    </form>
+
+    <!-- Toggle between login and register -->
+    <button class="auth-toggle-button" id="toggle-auth-mode">Don't have an account? Register here.</button>
+
+    <!-- Admin login redirect button -->
+    <button class="auth-toggle-button" id="admin-login-btn">Sign in as Admin</button>
+
+    <div class="php-note" style="margin-top: 1.5rem; text-align: center;"></div>
+</section>
+
+
+        <!-- Main Content Sections (Initially Hidden) -->
+        <section id="home-section" class="home-section hidden">
+            <h2 class="text-center">Welcome to Your Bee Management Hub!</h2>
+            <p class="text-center">
+                This system helps you efficiently manage all aspects of your apiculture business.
+                From tracking beehive sales and farmer training to monitoring hive health and managing honey sales,
+                we've got you covered. Generate electronic receipts with ease!
+            </p>
+            <p class="text-center">
+                Learn more about
+                <span class="hover-tooltip-container">
+                    <span class="hover-tooltip-text">Apiculture Best Practices</span>
+                    <span class="tooltip-content">Discover sustainable and efficient methods for bee farming.</span>
+                </span>
+                and how to ensure
+                <span class="hover-tooltip-container">
+                    <span class="hover-tooltip-text">Colony Health</span>
+                    <span class="tooltip-content">Healthy colonies lead to higher honey yields and stronger bees.</span>
+                </span>.
+            </p>
+            
+        </section>
+
+        <section id="beehive-sales-section" class="hidden">
+            <h2>Record Beehive Sale</h2>
+            <form id="beehive-sales-form">
+                <div class="form-group">
+                    <label for="beehive-customerName">Customer Name</label>
+                    <input type="text" id="beehive-customerName" name="customerName" placeholder="Enter Customer's Names" required>
+                </div>
+                <div class="form-group">
+                    <label for="beehive-type">Beehive Type</label>
+                    <select id="beehive-type" name="beehiveType" required>
+                        <option value="">--Select Beehive Type--</option>
+                        <option value="Langstroth" data-price="3500">Langstroth </option>
+                        <option value="Kenya Top Bar" data-price="2800">Kenya Top Bar</option>
+                        <option value="Dadant" data-price="4000">Dadant </option>
+                        <option value="Warre" data-price="3200">Warre </option>
+                        <option value="Flow Hive" data-price="12000">Flow Hive</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="beehive-quantity">Quantity</label>
+                    <input type="number" id="beehive-quantity" name="quantity" placeholder="E.g., 5" required min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="beehive-pricePerUnit">Price Per Unit (Ksh)</label>
+                    <input type="number" id="beehive-pricePerUnit" name="pricePerUnit" placeholder="Auto-set" required readonly>
+                </div>
+                <div class="form-group">
+                    <label for="beehive-saleDate">Sale Date</label>
+                    <input type="date" id="beehive-saleDate" name="saleDate" required>
+                </div>
+                <button type="submit" class="submit-button">Record Sale</button>
+            </form>
+        </section>
+
+        <section id="farmer-training-section" class="hidden">
+            <h2>Record Farmer Training</h2>
+            <form id="farmer-training-form">
+                <div class="form-group">
+                    <label for="farmer-name">Farmer Name</label>
+                    <input type="text" id="farmer-name" name="farmerName" placeholder="Enter Farmer's Names" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="farmer-contact">Contact Information</label>
+                    <input type="text" id="farmer-contact" name="contact" placeholder="E.g., +2547XXXXXXXX" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="training-topic">Training Topic</label>
+                    <select id="training-topic" name="trainingTopic" required>
+                        <option value="" disabled selected>--Select a topic--</option>
+                        <option value="Introduction to Beekeeping and Honeybee Biology">Introduction to Beekeeping and Honeybee Biology</option>
+                        <option value="Types of Beehives and Equipment">Types of Beehives and Equipment</option>
+                        <option value="Setting Up an Apiary">Setting Up an Apiary</option>
+                        <option value="Hive Management and Maintenance">Hive Management and Maintenance</option>
+                        <option value="Understanding Bee Colony Structure and Behavior">Understanding Bee Colony Structure and Behavior</option>
+                        <option value="Honey Flow and Nectar Sources">Honey Flow and Nectar Sources</option>
+                        <option value="Harvesting Honey Safely and Efficiently">Harvesting Honey Safely and Efficiently</option>
+                        <option value="Processing and Storing Honey">Processing and Storing Honey</option>
+                        <option value="Quality Standards and Grading of Honey">Quality Standards and Grading of Honey</option>
+                        <option value="Value Addition in Beekeeping">Value Addition in Beekeeping</option>
+                        <option value="Common Bee Diseases and Their Management">Common Bee Diseases and Their Management</option>
+                        <option value="Integrated Pest Management (IPM) for Beekeeping">Integrated Pest Management (IPM) for Beekeeping</option>
+                        <option value="Nutrition and Feeding Practices for Bees">Nutrition and Feeding Practices for Bees</option>
+                        <option value="Recognizing and Preventing Colony Collapse Disorder">Recognizing and Preventing Colony Collapse Disorder</option>
+                        <option value="Sustainable Beekeeping Practices">Sustainable Beekeeping Practices</option>
+                        <option value="Pollination Services and Benefits to Agriculture">Pollination Services and Benefits to Agriculture</option>
+                        <option value="Marketing and Selling Honey and Bee Products">Marketing and Selling Honey and Bee Products</option>
+                        <option value="Record-Keeping and Financial Planning for Beekeepers">Record-Keeping and Financial Planning for Beekeepers</option>
+                        <option value="Legal and Regulatory Requirements in Apiculture">Legal and Regulatory Requirements in Apiculture</option>
+                        <option value="Climate Change and Its Impact on Beekeeping">Climate Change and Its Impact on Beekeeping</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="training-date">Training Date</label>
+                    <input type="date" id="training-date" name="trainingDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="training-county">County</label>
+                    <select id="training-county" name="county" required>
+                        <option value="">--Select County--</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="training-constituency">Constituency</label>
+                    <select id="training-constituency" name="constituency" required disabled>
+                        <option value="">--Select Constituency--</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="training-ward">Ward</label>
+                    <select id="training-ward" name="ward" required disabled>
+                        <option value="">--Select Ward--</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-button">Record Training</button>
+            </form>
+        </section>
+
+        <section id="beehive-monitoring-section" class="hidden">
+            <h2>Monitor Beehive</h2>
+            <form id="beehive-monitoring-form">
+                <div class="form-group">
+                    <label for="hive-id">Hive ID</label>
+                    <input type="text" id="hive-id" name="hiveId" placeholder="E.g., HIVE001" required>
+                </div>
+                <div class="form-group">
+                    <label for="hive-location">Location</label>
+                    <input type="text" id="hive-location" name="location" placeholder="Enter the Location" required>
+                </div>
+                <div class="form-group">
+                    <label for="inspection-date">Inspection Date</label>
+                    <input type="date" id="inspection-date" name="inspectionDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="colony-health">Colony Health</label>
+                    <select id="colony-health" name="colonyHealth" required>
+                        <option value="">--Select Health Status--</option>
+                        <option value="Healthy">Healthy (Strong, Active)</option>
+                        <option value="Moderate">Moderate (Developing, Some Activity)</option>
+                        <option value="Weak">Weak (Low Population, Less Active)</option>
+                        <option value="Diseased">Diseased (Visible Disease Symptoms)</option>
+                        <option value="Pest Infested">Pest Infested (e.g., Varroa mites, wax moths)</option>
+                        <option value="Dead Colony">Dead Colony (No Signs of Life)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="honey-estimate">Honey Production Estimate (kg)</label>
+                    <input type="number" id="honey-estimate" name="honeyProductionEstimate" placeholder="E.g., 15" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="monitoring-notes">Notes</label>
+                    <textarea id="monitoring-notes" name="notes" placeholder="Any observations, actions taken, etc." rows="4"></textarea>
+                </div>
+                <button type="submit" class="submit-button">Record Monitoring</button>
+            </form>
+        </section>
+
+        <section id="honey-sales-section" class="hidden">
+            <h2>Record Honey Sale</h2>
+            <form id="honey-sales-form">
+                <div class="form-group">
+                    <label for="honey-customerName">Customer Name</label>
+                    <input type="text" id="honey-customerName" name="customerName" placeholder="Enter Customer's Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="honey-type">Honey Type</label>
+                    <select id="honey-type" name="honeyType" required>
+                        <option value="">--Select Honey Type--</option>
+                        <option value="Acacia Honey" data-price="850">Acacia Honey </option>
+                        <option value="Multi-floral Honey" data-price="780">Multi-floral Honey </option>
+                        <option value="Forest Honey" data-price="920">Forest Honey</option>
+                        <option value="Clover Honey" data-price="800">Clover Honey </option>
+                        <option value="Eucalyptus Honey" data-price="880">Eucalyptus Honey </option>
+                        <option value="Lavender Honey" data-price="950">Lavender Honey </option>
+                        <option value="Manuka Honey" data-price="2500">Manuka Honey </option>
+                        <option value="Orange Blossom Honey" data-price="820">Orange Blossom Honey </option>
+                        <option value="Wildflower Honey" data-price="750">Wildflower Honey </option>
+                        <option value="Sunflower Honey" data-price="790">Sunflower Honey </option>
+                        <option value="Buckwheat Honey" data-price="900">Buckwheat Honey </option>
+                        <option value="Sourwood Honey" data-price="1100">Sourwood Honey </option>
+                        <option value="Tupelo Honey" data-price="1050">Tupelo Honey </option>
+                        <option value="Avocado Honey" data-price="830">Avocado Honey </option>
+                        <option value="Calluna Honey" data-price="970">Calluna Honey </option>
+                        <option value="Dandelion Honey" data-price="760">Dandelion Honey </option>
+                        <option value="Fireweed Honey" data-price="910">Fireweed Honey </option>
+                        <option value="Linden Honey" data-price="860">Linden Honey </option>
+                        <option value="Sage Honey" data-price="890">Sage Honey </option>
+                        <option value="Thyme Honey" data-price="980">Thyme Honey </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="honey-quantityKg">Quantity (kg)</label>
+                    <input type="number" id="honey-quantityKg" name="quantityKg" placeholder="E.g., 10" required min="0.1" step="0.1" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="honey-pricePerKg">Price Per Kg (Ksh)</label>
+                    <input type="number" id="honey-pricePerKg" name="pricePerKg" placeholder="Auto-set" required readonly>
+                </div>
+                <div class="form-group">
+                    <label for="honey-saleDate">Sale Date</label>
+                    <input type="date" id="honey-saleDate" name="saleDate" required>
+                </div>
+                <button type="submit" class="submit-button">Record Sale</button>
+            </form>
+        </section>
+
+        <section id="receipts-section" class="hidden">
+            <h2>Electronic Receipts</h2>
+            <div id="receipts-container" class="receipts-grid">
+                <p class="text-center" style="grid-column: 1 / -1; color: #4B5563;">No receipts generated yet. Record a sale to see receipts here.</p>
+            </div>
+        </section>
+
+        <!-- My Account Section (Initially Hidden) -->
+        <section id="my-account-section" class="hidden">
+            <h2 class="text-center">My Account</h2>
+            <div class="profile-picture-container">
+                <img id="profile-pic-display" src="https://placehold.co/120x120/FACC15/78350F?text=No+Pic" alt="Profile Picture" class="profile-picture">
+                <div class="profile-username" id="profile-name-display">User Name</div>
+                <div class="profile-email" id="profile-email-display">user@example.com</div>
+            </div>
+
+            <h3>Update Profile Information</h3>
+            <form id="update-profile-form">
+                <div class="form-group">
+                    <label for="profile-name">Name</label>
+                    <input type="text" id="profile-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile-email">Email</label>
+                    <input type="email" id="profile-email" name="email" required readonly> <!-- Email usually not editable -->
+                </div>
+                <div class="form-group">
+                    <label for="profile-phone">Phone Number</label>
+                    <input type="text" id="profile-phone" name="phone_number" placeholder="E.g., +254712345678">
+                </div>
+                <button type="submit" class="submit-button">Update Profile</button>
+            </form>
+
+            <h3 style="margin-top: 2rem;">Upload Profile Picture</h3>
+            <form id="profile-picture-upload-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="profile-picture-input">Choose Image</label>
+                    <input type="file" id="profile-picture-input" name="profile_picture" accept="image/*" required>
+                </div>
+                <button type="submit">Upload Picture</button>
+            </form>
+        </section>
+
+    </main>
+
+    <script>
+        function printReceipt(button) {
+    const receiptDiv = button.previousElementSibling;
+
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.write('<html><head><title>Receipt</title>');
+    printWindow.document.write('<style>');
+    printWindow.document.write(`
+        body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+        h3 { color: #92400E; }
+        .details-section { margin-top: 10px; }
+        .details-section p { margin: 3px 0; }
+        .total-amount { font-size: 1.2rem; font-weight: bold; margin-top: 10px; }
+        .thank-you-note { margin-top: 20px; font-size: 0.85rem; text-align: right; }
+    `);
+    printWindow.document.write('</style></head><body >');
+    printWindow.document.write(receiptDiv.innerHTML);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+}
+
+        // IMPORTANT: Configure your PHP backend URL here.
+        // This must match the URL where your PHP 'api' folder is hosted.
+        const BASE_API_URL = 'http://localhost/api'; // <--- CHANGE THIS TO YOUR ACTUAL PHP API BASE URL
+
+        let currentReceipts = []; // Array to store simulated/fetched receipts
+
+        // --- DOM Elements ---
+        const navButtons = document.querySelectorAll('#main-nav button');
+        const sections = document.querySelectorAll('main section');
+        const receiptsContainer = document.getElementById('receipts-container');
+        const mainNav = document.getElementById('main-nav');
+        const userProfileMenu = document.getElementById('user-profile-menu');
+        const userInitialsBtn = document.getElementById('user-initials-btn');
+        const userDropdownContent = document.getElementById('user-dropdown-content');
+        const logoutBtn = document.getElementById('logout-btn');
+        const myAccountBtn = document.getElementById('my-account-btn');
+
+        // Auth elements
+        const loginRegisterSection = document.getElementById('login-register-section');
+        const authHeading = document.getElementById('auth-heading');
+        const authForm = document.getElementById('auth-form');
+        const nameGroup = document.getElementById('name-group');
+        const authNameInput = document.getElementById('auth-name');
+        const authEmailInput = document.getElementById('auth-email');
+        const authPasswordInput = document.getElementById('auth-password');
+        // Removed reference to authConfirmPasswordInput as it's no longer in HTML
+        const authSubmitBtn = document.getElementById('auth-submit-btn');
+        const toggleAuthModeBtn = document.getElementById('toggle-auth-mode');
+
+        // My Account elements
+        const profilePicDisplay = document.getElementById('profile-pic-display');
+        const profileNameDisplay = document.getElementById('profile-name-display');
+        const profileEmailDisplay = document.getElementById('profile-email-display');
+        const updateProfileForm = document.getElementById('update-profile-form');
+        const profileNameInput = document.getElementById('profile-name');
+        const profileEmailInput = document.getElementById('profile-email');
+        const profilePhoneInput = document.getElementById('profile-phone');
+        const profilePictureUploadForm = document.getElementById('profile-picture-upload-form');
+        const profilePictureInput = document.getElementById('profile-picture-input');
+
+
+        // --- Authentication State Management ---
+        const user = {
+            id: null,
+            name: null,
+            email: null,
+            phone_number: null,
+            profile_picture_url: null,
+            isLoggedIn: false
+        };
+
+        function saveUserState() {
+            localStorage.setItem('userState', JSON.stringify(user));
+        }
+
+        function loadUserState() {
+            const savedState = localStorage.getItem('userState');
+            if (savedState) {
+                Object.assign(user, JSON.parse(savedState));
+            }
+        }
+
+        function clearUserState() {
+            user.id = null;
+            user.name = null;
+            user.email = null;
+            user.phone_number = null;
+            user.profile_picture_url = null;
+            user.isLoggedIn = false;
+            localStorage.removeItem('userState');
+        }
+
+        function getInitials(name) {
+            if (!name) return '??';
+            const parts = name.split(' ');
+            if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+            return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+        }
+
+        function renderUserProfileButton() {
+            if (user.isLoggedIn && user.name) {
+                userInitialsBtn.textContent = getInitials(user.name);
+                userProfileMenu.classList.remove('hidden');
+
+                // Construct full URL for profile picture
+                if (user.profile_picture_url) {
+                    // Assuming profile_picture_url is like 'api/uploads/profile_pictures/...'
+                    // We need to make it an absolute URL for the browser
+                    const fullProfilePicUrl = `${window.location.origin}/${user.profile_picture_url}`;
+                    profilePicDisplay.src = fullProfilePicUrl;
+                } else {
+                    profilePicDisplay.src = 'https://placehold.co/120x120/FACC15/78350F?text=No+Pic';
+                }
+            } else {
+                userProfileMenu.classList.add('hidden');
+            }
+        }
+
+        function showSection(sectionId) {
+            sections.forEach(section => section.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            navButtons.forEach(btn => {
+                if (btn.dataset.section + '-section' === sectionId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Special handling for Receipts and My Account
+            if (sectionId === 'receipts-section') {
+                fetchAndRenderReceipts();
+            } else if (sectionId === 'my-account-section') {
+                populateMyAccount();
+            }
+        }
+
+        function checkAuthAndRender() {
+            loadUserState();
+            if (user.isLoggedIn) {
+                loginRegisterSection.classList.add('hidden');
+                mainNav.classList.remove('hidden');
+                renderUserProfileButton();
+                showSection('home-section');
+                   // Show home page after login
+            } else {
+                loginRegisterSection.classList.remove('hidden');
+                mainNav.classList.add('hidden');
+                userProfileMenu.classList.add('hidden');
+                showSection('login-register-section'); // Ensure login page is shown
+            }
+        }
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial date for date inputs
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('beehive-saleDate').value = today;
+            document.getElementById('farmer-training-form').querySelector('input[type="date"]').value = today;
+            document.getElementById('inspection-date').value = today;
+            document.getElementById('honey-saleDate').value = today;
+
+            checkAuthAndRender(); // Perform initial auth check
+
+            // Toggle Login/Register Form
+            let isRegisterMode = false;
+            toggleAuthModeBtn.addEventListener('click', () => {
+                isRegisterMode = !isRegisterMode;
+                authHeading.textContent = isRegisterMode ? 'Register' : 'Login';
+                authSubmitBtn.textContent = isRegisterMode ? 'Register' : 'Login';
+                nameGroup.style.display = isRegisterMode ? 'block' : 'none';
+                // Removed confirmPasswordGroup as per request
+                toggleAuthModeBtn.textContent = isRegisterMode ? 'Already have an account? Login here.' : 'Don\'t have an account? Register here.';
+                authNameInput.required = isRegisterMode;
+                authForm.reset(); // Clear form fields on mode switch
+            });
+
+            // Handle Login/Register Form Submission
+            authForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = authEmailInput.value;
+                const password = authPasswordInput.value;
+                const name = authNameInput.value; // This will be empty for login mode initially
+                
+                // Removed password match validation as confirm password input is removed
+
+                const endpoint = isRegisterMode ? `${BASE_API_URL}/register.php` : `${BASE_API_URL}/login.php`;
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('password', password);
+                if (isRegisterMode) {
+                    formData.append('name', name);
+                }
+
+                // Log formData to console for debugging "All fields are required" error
+                console.log('Sending FormData:', Object.fromEntries(formData.entries()));
+
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert(result.message);
+                        if (!isRegisterMode) { // Only log in if it was a login attempt or successful registration
+                            user.id = result.user.id;
+                            user.name = result.user.name;
+                            user.email = result.user.email;
+                            user.phone_number = result.user.phone_number; // Assuming phone_number is returned
+                            user.profile_picture_url = result.user.profile_picture_url; // Assuming URL is returned
+                            user.isLoggedIn = true;
+                            saveUserState();
+                            checkAuthAndRender();
+                            alert('Login successful!'); // Transition to home page
+                        } else {
+                             // After successful registration, switch to login mode and prompt user to login
+                             isRegisterMode = false;
+                             authHeading.textContent = 'Login';
+                             authSubmitBtn.textContent = 'Login';
+                             nameGroup.style.display = 'none';
+                             toggleAuthModeBtn.textContent = 'Don\'t have an account? Register here.';
+                             authNameInput.required = false;
+                             authForm.reset();
+                             // Show success message and indicate to log in
+                             alert('Registration successful! You can now log in.');
+                        }
+                    } else {
+                        alert('Error: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Authentication error:', error);
+                    alert('Network error or server issue. Please try again.');
+                }
+            });
+
+            // --- User Profile Menu ---
+            userInitialsBtn.addEventListener('click', (event) => {
+                userDropdownContent.classList.toggle('show');
+                event.stopPropagation(); // Prevent click from propagating to document
+            });
+
+            document.addEventListener('click', (event) => {
+                // Close dropdown if clicked outside
+                if (!userProfileMenu.contains(event.target)) {
+                    userDropdownContent.classList.remove('show');
+                }
+            });
+
+            logoutBtn.addEventListener('click', () => {
+                clearUserState();
+                checkAuthAndRender();
+                alert('You have been logged out.');
+                userDropdownContent.classList.remove('show');
+            });
+
+            myAccountBtn.addEventListener('click', () => {
+                showSection('my-account-section');
+                userDropdownContent.classList.remove('show');
+            });
+
+            // --- My Account Page Logic ---
+            function populateMyAccount() {
+                profileNameInput.value = user.name || '';
+                profileEmailInput.value = user.email || '';
+                profilePhoneInput.value = user.phone_number || '';
+
+                profileNameDisplay.textContent = user.name || 'User Name';
+                profileEmailDisplay.textContent = user.email || 'user@example.com';
+
+                if (user.profile_picture_url) {
+                    // Ensure the displayed URL is correctly formed for the browser
+                    const fullProfilePicUrl = `${window.location.origin}/${user.profile_picture_url}`;
+                    profilePicDisplay.src = fullProfilePicUrl;
+                } else {
+                    profilePicDisplay.src = 'https://placehold.co/120x120/FACC15/78350F?text=No+Pic';
+                }
+            }
+
+            updateProfileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData();
+                formData.append('user_id', user.id);
+                formData.append('name', profileNameInput.value);
+                // Email is readonly, so we just use the stored one
+                formData.append('email', user.email);
+                formData.append('phone_number', profilePhoneInput.value);
+
+                try {
+                    const response = await fetch(`${BASE_API_URL}/update_profile.php`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert('Profile updated successfully!');
+                        // Update local user state with new data
+                        user.name = result.user.name;
+                        user.phone_number = result.user.phone_number;
+                        saveUserState();
+                        populateMyAccount(); // Re-populate to show updated info
+                        renderUserProfileButton(); // Update initials if name changed
+                    } else {
+                        alert('Error updating profile: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                    alert('Network error or server issue while updating profile.');
+                }
+            });
+
+            profilePictureUploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData();
+                formData.append('user_id', user.id);
+                formData.append('profile_picture', profilePictureInput.files[0]);
+
+                if (!profilePictureInput.files[0]) {
+                    alert('Please select an image to upload.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${BASE_API_URL}/upload_profile_picture.php`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert('Profile picture uploaded successfully!');
+                        user.profile_picture_url = result.profile_picture_url; // Update URL
+                        saveUserState();
+                        populateMyAccount(); // Update image on display
+                        renderUserProfileButton(); // Update image in top right if necessary
+                    } else {
+                        alert('Error uploading picture: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error uploading picture:', error);
+                    alert('Network error or server issue during picture upload.');
+                }
+            });
+
+
+            // --- Main Navigation ---
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    sections.forEach(section => section.classList.add('hidden'));
+                    const targetSectionId = button.dataset.section + '-section';
+                    document.getElementById(targetSectionId).classList.remove('hidden');
+
+                    // Special handling for Receipts
+                    if (button.dataset.section === 'receipts') {
+                        fetchAndRenderReceipts();
+                    }
+                });
+            });
+
+            // --- Dropdown Price/Value Logic ---
+
+            // Beehive Sales: Auto-set price based on beehive type selection
+            const beehiveTypeSelect = document.getElementById('beehive-type');
+            const beehivePriceInput = document.getElementById('beehive-pricePerUnit');
+
+            const updateBeehivePrice = () => {
+                const selectedOption = beehiveTypeSelect.options[beehiveTypeSelect.selectedIndex];
+                const price = selectedOption.dataset.price;
+                if (price) {
+                    beehivePriceInput.value = price;
+                } else {
+                    beehivePriceInput.value = ''; // Clear if no valid option selected
+                }
+            };
+            beehiveTypeSelect.addEventListener('change', updateBeehivePrice);
+            updateBeehivePrice(); // Call initially to set price if a default option is pre-selected
+
+            // Honey Sales: Auto-set price based on honey type selection
+            const honeyTypeSelect = document.getElementById('honey-type');
+            const honeyPriceInput = document.getElementById('honey-pricePerKg');
+
+            const updateHoneyPrice = () => {
+                const selectedOption = honeyTypeSelect.options[honeyTypeSelect.selectedIndex];
+                const price = selectedOption.dataset.price;
+                if (price) {
+                    honeyPriceInput.value = price;
+                } else {
+                    honeyPriceInput.value = ''; // Clear if no valid option selected
+                }
+            };
+            honeyTypeSelect.addEventListener('change', updateHoneyPrice);
+            updateHoneyPrice(); // Call initially to set price if a default option is pre-selected
+
+
+            // --- Kenya Administrative Divisions Data (Partial Example) ---
+            // YOU MUST EXPAND THIS DATA FOR ALL 47 COUNTIES, THEIR CONSTITUENCIES, AND WARDS
+            const kenyaLocations = {
+            "Baringo": {
+                "Baringo Central": ["Kapropita", "Ewalel", "Kabarnet", "Kapsongol", "Seguton"],
+                "Baringo North": ["Barwessa", "Bartabwa", "Kabartonjo", "Saimo-Kipsaraman", "Tirioko"],
+                "Baringo South": ["Eldama Ravine", "Koibatek", "Mogotio", "Kisanana", "Mochongoi"],
+                "Mogotio": ["Mogotio", "Kisanana", "Emining"],
+                "Eldama Ravine": ["Eldama Ravine", "Lembus", "Mogotio"]
+            },
+            "Bomet": {
+                "Bomet Central": ["Chesoen", "Mutarakwa", "Silibwet", "Singorwet", "Ndanai"],
+                "Bomet East": ["Chemaner", "Longisa", "Merigi", "Kembu", "Kipreres"],
+                "Chepalungu": ["Chepalungu", "Siongiroi", "Sigor", "Kongasis"],
+                "Konoin": ["Boito", "Kimulot", "Embomos", "Mogogosiek"],
+                "Sotik": ["Nyangores", "Kapletundo", "Kipsonoi", "Mutkwa", "Kembu"]
+            },
+            "Bungoma": {
+                "Bumula": ["Bumula", "Khasoko", "Kimaeti", "South Bukusu"],
+                "Kabuchai": ["Chwele", "Kabuchai", "West Nalondo", "East Nalondo"],
+                "Kanduyi": ["Bukembe West", "Kanduyi", "Marakaru", "Mihuu", "Khalaba"],
+                "Sirisia": ["Malakisi", "Lwandanyi", "Sirisia"],
+                "Tongaren": ["Kamukuywa", "Mbakalo", "Ndalu", "Tongaren"]
+            },
+            "Busia": {
+                "Budalangi": ["Busia", "Bunyala North", "Bunyala South"],
+                "Butula": ["Butula", "Marachi North", "Marachi East"],
+                "Funyula": ["Namboboto", "Mayenje", "Bwiri"],
+                "Nambale": ["Nambale", "Manyatta", "Bukhayo North"],
+                "Samia": ["Samia East", "Samia North", "Samia South"],
+                "Teso North": ["Angurai East", "Angurai South", "Malaba Central"],
+                "Teso South": ["Amukura Central", "Amukura East", "Amukura West"]
+            },
+            "Elgeyo-Marakwet": {
+                "Keiyo North": ["Chepkorio", "Iten", "Kamariny", "Kaptagat"],
+                "Keiyo South": ["Chepsirei", "Kaptarakwa", "Kipchoge", "Soy North"],
+                "Marakwet East": ["Chesoi", "Kapyego", "Sambirir", "Koitilial"],
+                "Marakwet West": ["Arror", "Cherang'any/Chebororwa", "Kapsowar", "Lelan"]
+            },
+            "Embu": {
+                "Manyatta": ["Central", "Gaturi South", "Kithimu", "Mbeti North"],
+                "Mbeere North": ["Evurore", "Gitare", "Mavuria"],
+                "Mbeere South": ["Makima", "Mwea", "Nthawa", "Kiambere"],
+                "Runyenjes": ["Central", "Kagaari North", "Kagaari South", "Kyeni North"]
+            },
+            "Garissa": {
+                "Balambala": ["Balambala", "Jara Jara", "Sankuri"],
+                "Dadaab": ["Dadaab", "Damajale", "Fafi", "Liboi"],
+                "Fafi": ["Bura", "Dadaab", "Fafi", "Jarajila"],
+                "Garissa Township": ["Biashara", "Galbet", "Nominated", "Township"],
+                "Ijara": ["Ijara", "Sangailu", "Korakora"],
+                "Lagdera": ["Benane", "Dertu", "Goreale", "Modogashe"],
+                "Liboi": ["Liboi", "Kore", "Daba"]
+            },
+            "Homa Bay": {
+                "Kabondo Kasipul": ["Kabondo East", "Kabondo West", "Kasipul East"],
+                "Karachuonyo": ["Central Karachuonyo", "North Karachuonyo", "West Karachuonyo"],
+                "Kasipul": ["East Kasipul", "North Kasipul", "South Kasipul"],
+                "Ndhiwa": ["Kanyadoto", "Kanyamwa Kosewe", "Kwabwai"],
+                "Rangwe": ["East Rangwe", "North Rangwe", "South Rangwe"],
+                "Suba North": ["Gwassi North", "Gwassi South", "Ruma Kaksingri"],
+                "Suba South": ["Lambwe", "Rusinga East", "Rusinga West"]
+            },
+            "Isiolo": {
+                "Isiolo North": ["Bulla", "Chechelesi", "Oldo Nyiaro"],
+                "Isiolo South": ["Bulesa", "Garbatulla", "Kula Mawe"],
+                "Kinna": ["Kinna", "Garbatulla", "Sericho"],
+                "Garbatulla": ["Garbatulla", "Kinna", "Sericho"]
+            },
+            "Kajiado": {
+                "Kajiado Central": ["Dalalekutuk", "Entonet/Lenkisim", "Ildamat", "Matapato North"],
+                "Kajiado East": ["Imaroro", "Kaputiei North", "Kitengela", "Oloosirkon/Sholinke"],
+                "Kajiado North": ["Ngong", "Ongata Rongai", "Olkeri", "Nkaimurunya"],
+                "Kajiado South": ["Kuku", "Loitokitok", "Rombo", "Kimana"],
+                "Kajiado West": ["Ewuaso Oonkidong'i", "Keekonyokie", "Magadi", "Mosiro"]
+            },
+            "Kakamega": {
+                "Butere": ["Butere", "Marama North", "Marama West"],
+                "Ikolomani": ["Idakho North", "Idakho South", "Isukha North"],
+                "Khwisero": ["Khwisero", "North Marama", "East Marama"],
+                "Lurambi": ["Central Marama", "Esumeyia", "Malaika"],
+                "Matungu": ["Koyonzo", "Mayoni", "Namamali"],
+                "Mumias East": ["East Mumias", "Mumias Central", "South Mumias"],
+                "Mumias West": ["Mumias North", "West Mumias"],
+                "Navakholo": ["Bunyala West", "Bunyala East", "Nambale"],
+                "Lugari": ["Chekalini", "Lwanda", "Lumakanda", "Mautuma"],
+                "Malava": ["Chemuche", "East Kabras", "North Kabras", "West Kabras"],
+                "Shinyalu": ["Isukha East", "Isukha North", "Isukha South"],
+                "Likuyani": ["Likuyani", "Kongoni", "Sango", "Soy"]
+            },
+            "Kericho": {
+                "Ainamoi": ["Ainamoi", "Kapsoit", "Kipchebor", "Kapkugerwet"],
+                "Belgut": ["Cheptororiet/Seretut", "Kabianga", "Walungu", "Chaik"],
+                "Bureti": ["Chemosit", "Kibetung", "Litein", "Roret"],
+                "Kipkelion East": ["Londiani", "Chepseon", "Tendeno/Kabarus"],
+                "Kipkelion West": ["Chai", "Kunyak", "Kamasian", "Kipkelion"],
+                "Soin Sigowet": ["Kaplelartet", "Kapsorok", "Sigowet"]
+            },
+            "Kiambu": {
+                "Gatundu North": ["Gatundu", "Ndenda", "Magana", "Kihumbu-ini"],
+                "Gatundu South": ["Kiamwangi", "Kiru", "Ngenda", "Mangu"],
+                "Githunguri": ["Githunguri", "Githiga", "Kijabe", "Mangu"],
+                "Juja": ["Juja", "Witeithie", "Murera", "Kalimoni"],
+                "Kabete": ["Githunguri", "Kabete", "Muguga", "Nyathuna"],
+                "Kiambaa": ["Cianda", "Kihara", "Muchatha", "Ndenderu"],
+                "Kiambu Town": ["Biashara", "Kiamumbi", "Riabai", "Muchungucha"],
+                "Limuru": ["Limuru East", "Limuru Central", "Ndeiya", "Limuru West"],
+                "Ruiru": ["Biashara", "Gatongora", "Kahawa Sukari", "Kahawa Wendani"],
+                "Thika Town": ["Biashara", "Kamenu", "Township", "Hospital"],
+                "Lari": ["Kijabe", "Kinale", "Lari Kirenga", "Nyandurua"],
+                "Kabete": ["Kihuruko", "Uthiru", "Ndumboini", "Wangige"]
+            },
+            "Kilifi": {
+                "Ganze": ["Bamba", "Ganze", "Jaribuni"],
+                "Kaloleni": ["Kaloleni", "Mariakani", "Mavueni"],
+                "Kilifi North": ["Bahari", "Kilifi South", "Sokoni"],
+                "Kilifi South": ["Junju", "Mtepeni", "Shimo La Tewa"],
+                "Magarini": ["Gongoni", "Kibarani", "Malindi"],
+                "Malindi": ["Ganda", "Malindi Town", "Shella"],
+                "Rabuai": ["Rabuai", "Tezo", "Roka"]
+            },
+            "Kirinyaga": {
+                "Kirinyaga Central": ["Kanyekini", "Kerugoya", "Mutira", "Inoi"],
+                "Kirinyaga East": ["Gichugu", "Kabare", "Ngariama"],
+                "Kirinyaga West": ["Baragwi", "Karumandi", "Mwea"],
+                "Mwea": ["Gathigiriri", "Mutithi", "Wang'uru"]
+            },
+            "Kisii": {
+                "Bonchari": ["Bonchari", "Riana", "Bomariba"],
+                "Kitutu Chache North": ["Kegogi", "Mosocho", "Sensi"],
+                "Kitutu Chache South": ["Kisii Central", "Nyakoe", "Manga"],
+                "Nyaribari Chache": ["Bobasi", "Gesusu", "Ibeno", "Kiogoro"],
+                "Nyaribari Masaba": ["Ichuni", "Masimba", "Mogonga", "Nyansiongo"],
+                "South Mugirango": ["Bogichora", "Getenga", "Moticho", "Tabaka"],
+                "Bomachoge Borabu": ["Bomachoge", "Bobasi", "Nyaribari Chache"],
+                "Bomachoge Chache": ["Boochi/Tendere", "Sichoo", "Majoge/Bassi"],
+                "Bobasi": ["Bobasi Chache", "Sameta", "Nyacheki", "Gucha"],
+                "Manga": ["Manga", "Marani", "Mwamonari", "Sio"]
+            },
+            "Kisumu": {
+                "Kisumu Central": ["Kondele", "Manyatta B", "Shauri Moyo", "Market/Milimani"],
+                "Kisumu East": ["Kolwa East", "Kolwa Central", "Nyalenda B"],
+                "Kisumu West": ["Central Kisumu", "Kisumu North", "West Seme"],
+                "Muhoroni": ["Chemelil", "Miwani", "Ombeyi"],
+                "Nyakach": ["North Nyakach", "South Nyakach", "Central Nyakach"],
+                "Nyando": ["Awasi/Onjiko", "East Kano", "Kabonyo/Kanyagwal"],
+                "Seme": ["East Seme", "North Seme", "South Seme"]
+            },
+            "Kitui": {
+                "Kitui Central": ["Kitui Central", "Nzambani", "Township"],
+                "Kitui East": ["Mwingi North", "Kyangwithya East", "Kyangwithya West"],
+                "Kitui South": ["Ikutha", "Kanziko", "Mutomo"],
+                "Kitui West": ["Matinyani", "Mutonguni", "Kauwi"],
+                "Mwingi Central": ["Central", "Kyuso", "Mumoni"],
+                "Mwingi North": ["Tseikuru", "Ngomeni", "Waita"],
+                "Mwingi West": ["Kisasi", "Migwani", "Tharaka"],
+                "Mutitu": ["Mutitu", "Kisasi", "Ngongoni"]
+            },
+            "Kwale": {
+                "Kinango": ["Kinango", "Ndavaya", "Mackinnon Road"],
+                "Lunga Lunga": ["Dzombo", "Mwereni", "Ukunda"],
+                "Matuga": ["Kubo", "Mkongani", "Tiwi"],
+                "Msambweni": ["Gombato/Bongwe", "Ramisi", "Ukunda"]
+            },
+            "Laikipia": {
+                "Laikipia East": ["Ngobit", "Nanyuki", "Mutara", "Tigithi"],
+                "Laikipia North": ["Sosian", "Segera", "Mukogodo East", "Mukogodo West"],
+                "Laikipia West": ["Githiga", "Marmanet", "Nyahururu", "Rumuruti"]
+            },
+            "Lamu": {
+                "Lamu East": ["Faza", "Kiunga", "Kizingitini"],
+                "Lamu West": ["Lamu Central", "Hindi", "Mkomani", "Shela"]
+            },
+            "Machakos": {
+                "Kathiani": ["Kaewa", "Kathiani", "Lower Kaewa", "Mavoko"],
+                "Machakos Town": ["Central", "Kola", "Mumbuni North", "Muthini"],
+                "Masinga": ["Kivaa", "Masinga", "Mumbuni North", "Nthini"],
+                "Matungulu": ["Matungulu", "Tala", "Oldonyo Sabuk", "Kyanzavi"],
+                "Mavoko": ["Athi River", "Kinanie", "Syokimau/Mlolongo"],
+                "Mwala": ["Kibaoni", "Mwala", "Masii", "Makutano"],
+                "Yatta": ["Kithimani", "Matuu", "Ndalani", "Katangi"]
+            },
+            "Makueni": {
+                "Kaiti": ["Gomato", "Kaiti", "Ukia"],
+                "Kibwezi East": ["Masongaleni", "Mutomo", "Makindu"],
+                "Kibwezi West": ["Kibwezi", "Nguu", "Makindu"],
+                "Makueni": ["Kibwezi", "Mbooni", "Wote"],
+                "Mbooni": ["Kikumbulyu North", "Kikumbulyu South", "Mbumbuni"],
+                "Mutito Andei": ["Mtito Andei", "Kambu", "Ngomano"],
+                "Kilome": ["Kasikeu", "Mukaa", "Ukia"]
+            },
+            "Mandera": {
+                "Banissa": ["Banissa", "Guba", "Kiliwehiri", "Ashabito"],
+                "Lafey": ["Lafey", "Fino", "Warankara"],
+                "Mandera East": ["Arabia", "Border Point 1", "Khalalio", "Mandera Town"],
+                "Mandera North": ["Ashabito", "Rhamu", "Rhamu Dimtu"],
+                "Mandera South": ["Dandu", "Gither", "Kutulo", "Shimbir Fatuma"],
+                "Mandera West": ["Takaba North", "Takaba South", "Lafey", "Wargadud"]
+            },
+            "Marsabit": {
+                "Laisamis": ["Karare", "Kargi", "Laisamis", "Logologo"],
+                "Moyale": ["Butiye", "Central", "Godoma", "Heillu"],
+                "North Horr": ["Dukana", "Illeret", "Maikona", "North Horr"],
+                "Saku": ["Sagante/Jaldesa", "Marsabit Central", "Karare"]
+            },
+            "Meru": {
+                "Buuri": ["Amwathi", "Buuri", "Kiagu", "Ruiri/Rwarera"],
+                "Central Imenti": ["Abothuguchi Central", "Abothuguchi West", "Kiguchwa"],
+                "Igembe Central": ["Athiru Gaiti", "Akachiu", "Kiegoi/Antubochiu"],
+                "Igembe North": ["Amwathi", "Antuamburi", "Kiguchwa", "Ntunene"],
+                "Igembe South": ["Akithii", "Maua", "Athiru Gaiti", "Kiegoi"],
+                "North Imenti": ["Municipality", "Ntima East", "Ntima West"],
+                "South Imenti": ["Abogeta East", "Abogeta West", "Mugumango"],
+                "Tigania East": ["Athwana", "Kianjai", "Mikinduri", "Muthara"],
+                "Tigania West": ["Akithii", "Kiguchwa", "Nkomo", "Ruiri/Rwarera"]
+            },
+            "Migori": {
+                "Awendo": ["Awendo", "North Sakwa", "South Sakwa"],
+                "Kuria East": ["Bugumbe", "Ntimaru East", "Ntimaru West"],
+                "Kuria West": ["Masaba", "Tagare", "Gokeharaka/Getongoroma"],
+                "Nyatike": ["Kanyasa", "Muhuru", "Karungu"],
+                "Rongo": ["Central Kamagambo", "East Kamagambo", "North Kamagambo"],
+                "Suna East": ["Kakrao", "Kanyamkago", "Suna Central"],
+                "Suna West": ["God Jope", "Wasweta II", "Nyamome"],
+                "Uriri": ["Central Kanyamkago", "North Kanyamkago", "West Kanyamkago"]
+            },
+            "Mombasa": {
+                "Changamwe": ["Changamwe", "Chaani", "Kipevu", "Kizimani"],
+                "Jomvu": ["Jomvu Kuu", "Miritini", "Mikindani"],
+                "Kisauni": ["Aldina", "Bamburi", "Mwakirunge", "Shanzu"],
+                "Likoni": ["Bofu", "Likoni", "Shika Adabu", "Timbwani"],
+                "Mvita": ["Majengo Gunda", "Old Town", "Tononoka"],
+                "Nyali": ["Frere Town", "Kadzandani", "Kongowea", "Mkomani"]
+            },
+            "Murang'a": {
+                "Kandara": ["Gatitu", "Kagunduini", "Muguru", "Muruka"],
+                "Kangema": ["Kanyenyaini", "Muguru", "Rwathia"],
+                "Kigumo": ["Kangari", "Kihumbu-ini", "Kinyona", "Murarandia"],
+                "Maragwa": ["Kamahuha", "Makuyu", "Murang'a East", "Nginda"],
+                "Mathioya": ["Gatura", "Kiruri", "Rwathia"],
+                "Murang'a South": ["Kahumbu", "Kariara", "Komothai", "Mugumu"],
+                "Kangema": ["Kangema", "Kanyenyaini", "Muguru"]
+            },
+            "Nairobi": {
+                "Dagoretti North": ["Kawangware", "Kileleshwa", "Lavington", "Mutuini"],
+                "Dagoretti South": ["Mutuini", "Ngando", "Riruta", "Uthiru/Ruthimitu"],
+                "Embakasi East": ["Embakasi", "Kayole North", "Lower Savannah", "Upper Savannah"],
+                "Embakasi South": ["Imara Daima", "Kariobangi South", "Pipeline"],
+                "Embakasi Central": ["Kariobangi North", "Korogocho", "Maringo/Hamza", "Pumwani"],
+                "Embakasi North": ["Dandora I", "Dandora II", "Dandora III", "Dandora IV"],
+                "Embakasi West": ["Umoja I", "Umoja II", "Mihango", "Umoja III"],
+                "Kamukunji": ["Eastleigh North", "Eastleigh South", "Kamukunji", "Pumwani"],
+                "Kasarani": ["Kasarani", "Mwiki", "Clay City", "Ruai"],
+                "Lang'ata": ["Karen", "Laini Saba", "Mugumo-ini", "South C"],
+                "Makadara": ["Makongeni", "Maringo/Hamza", "Viwandani"],
+                "Mathare": ["Hospital", "Mabatini", "Huruma", "Kiamaiko"],
+                "Roysambu": ["Githurai", "Kahawa West", "Zimmerman", "Roysambu"],
+                "Ruaraka": ["Baba Dogo", "Dandora", "Korogocho", "Lucky Summer"],
+                "Starehe": ["Central Business District", "Ngara", "Pangani", "Nairobi South"],
+                "Westlands": ["Kitisuru", "Parklands/Highridge", "Karura", "Mountain View"]
+            },
+            "Nakuru": {
+                "Bahati": ["Bahati", "Kabatini", "Dundori", "Kiamaina"],
+                "Gilgil": ["Gilgil", "Elementaita", "Malewa West", "Mbaruk/Eburu"],
+                "Kuresoi North": ["Kiptororo", "Nyota", "Sirikwa", "Subukia West"],
+                "Kuresoi South": ["Amalo", "Keringet", "Kiptagich", "Tinet"],
+                "Naivasha": ["Biashara", "Hell's Gate", "Lake View", "Maai Mahiu"],
+                "Nakuru Town East": ["Biashara", "Kivumbini", "Flamingo", "Bondeni"],
+                "Nakuru Town West": ["Barut East", "Barut West", "London", "Shabab"],
+                "Njoro": ["Lare", "Mauche", "Njoro", "Nesuit"],
+                "Rongai": ["Solai", "Visoi", "Menengai West", "Mogotio"],
+                "Subukia": ["Kabatini", "Subukia East", "Subukia West"]
+            },
+            "Nandi": {
+                "Aldai": ["Kaptumo/Kaboi", "Kobujoi", "Terik", "Keteng"],
+                "Chesumei": ["Chemundu/Kapng'etich", "Kaptel/Kamoiywo", "Mutwot", "Kosirai"],
+                "Emgwen": ["Chepkumia", "Kapsabet", "Kilibwoni", "Ol'Lessos"],
+                "Mosop": ["Chepterwai", "Kabiyet", "Ndalat", "Sarur"],
+                "Nandi Hills": ["Chesumei", "Kapsabet", "Nandi Hills", "Kimondi"],
+                "Tinderet": ["Chepterit", "Lessos", "Songhor/Soba", "Tinderet"]
+            },
+            "Narok": {
+                "Kilgoris": ["Angata Barikoi", "Ilkerin", "Kilgoris Central", "Shankoe"],
+                "Narok East": ["Ildamat", "Kajiado", "Narok", "Sikawa"],
+                "Narok North": ["Olpusimoru", "Narok Town", "Olokurto", "Olorropil"],
+                "Narok South": ["Loita", "Majimoto/Naroosura", "Ololulunga", "Maji Moto"],
+                "Narok West": ["Mara", "Siana", "Tokosei"],
+                "Emurua Dikirr": ["Ilmashariani", "Kamurar", "Mogondo", "Ololulunga"]
+            },
+            "Nyamira": {
+                "Borabu": ["Esise", "Mokomoni", "Nyansiongo", "Rangenyo"],
+                "North Mugirango": ["Bomwagamo", "Ekerenyo", "Magwagwa", "Itibo"],
+                "Nyamira South": ["Bokeira", "Kebirigo", "Nyabite", "Township"],
+                "West Mugirango": ["Nyamaiya", "Nyamira North", "Rigoma", "Bogichora"]
+            },
+            "Nyandarua": {
+                "Kinangop": ["Engineer", "Magumu", "Githabai", "Murungaru"],
+                "Kipipiri": ["Githioro", "Kipipiri", "Wanjohi"],
+                "Ol Kalou": ["Karau", "Ol Kalou Town", "Rurii", "Kaimbaga"],
+                "Ol Joro Orok": ["Gatimu", "Gathanji", "Murungaru", "Ol Joro Orok"],
+                "Ndung'u": ["Lesiolo", "Shamata", "Maitho", "Ndungu"]
+            },
+            "Nyeri": {
+                "Kieni": ["Amboni", "Kabaru", "Mukurweini", "Naromoru/Kiamathaga"],
+                "Mathira": ["Konyu", "Magutu", "Maturu", "Ruguru"],
+                "Mukurweini": ["Gikondi", "Mutira", "Rutune", "Giathugu"],
+                "Nyeri Town": ["Gatitu/Muruguru", "Kamakwa", "Rware", "Nyeri Central"],
+                "Othaya": ["Chinga", "Mahiga", "Mumwe", "Iria-ini"],
+                "Tetu": ["Aguthi/Gaaki", "Kiganjo/Mathira", "Muthira", "Wamagana"]
+            },
+            "Samburu": {
+                "Samburu East": ["Waso", "Wamba West", "Wamba East"],
+                "Samburu North": ["Marti", "Ndoto", "Nyiro"],
+                "Samburu West": ["Lodokejek", "Suguta", "Loosuk"]
+            },
+            "Siaya": {
+                "Alego Usonga": ["Central Alego", "North Alego", "Siaya Township", "Usonga"],
+                "Bondo": ["Bondo", "Central Sakwa", "Yimbo East", "Yimbo West"],
+                "Gem": ["Central Gem", "East Gem", "North Gem", "South Gem"],
+                "Rarieda": ["East Asembo", "North Uyoma", "West Asembo"],
+                "Ugenya": ["East Ugenya", "North Ugenya", "West Ugenya"],
+                "Ugunja": ["North Ugenya", "South Ugenya"]
+            },
+            "Taita Taveta": {
+                "Mwatate": ["Chawia", "Mwatate", "Ronge", "Wusi/Kishushe"],
+                "Taveta": ["Bomeni", "Mboghoni", "Mata", "Chala"],
+                "Voi": ["Kaloleni", "Sagala", "Kasigau", "Marungu"],
+                "Wundanyi": ["Wundanyi/Mbale", "Mwang'ondi", "Werugha", "Mgange/Mwanda"]
+            },
+            "Tana River": {
+                "Bura": ["Chewele", "Dara", "Madogo", "Bura"],
+                "Galole": ["Garsen", "Gwano", "Mnazini", "Wayu"],
+                "Garsen": ["Kipini East", "Kipini West", "Ndera", "Tana Delta"]
+            },
+            "Tharaka Nithi": {
+                "Chuka/Igambang'ombe": ["Karingani", "Magumoni", "Mugwe"],
+                "Maara": ["Chogoria", "Mitheru", "Mitunguu"],
+                "Tharaka": ["Chiakariga", "Gatunga", "Marimanti", "Nukuni"]
+            },
+            "Trans Nzoia": {
+                "Cherangany": ["Cherangany/Chebororwa", "Kiptoror", "Makandara", "Motosiet"],
+                "Endebess": ["Chepchoina", "Endebess", "Kachibora"],
+                "Kiminini": ["Kiminini", "Nabiswa", "Waitaluk"],
+                "Saboti": ["Kinyoro", "Saboti", "Matisi"],
+                "Kapomboi": ["Kapomboi", "Sikhendu", "Kitale"]
+            },
+            "Turkana": {
+                "Loima": ["Loima", "Turkwel", "Kotaruk/Lopur"],
+                "Turkana Central": ["Lodwar", "Turkwel", "Kang'atotha"],
+                "Turkana East": ["Katilia", "Lokori", "Kapedo/Napeitom"],
+                "Turkana North": ["Kaaleng/Kaareng", "Lokitaung", "Lowareng'ak"],
+                "Turkana South": ["Kalokol", "Lokichar", "Turkana South"],
+                "Turkana West": ["Lokichoggio", "Oropoi", "Nanaam"]
+            },
+            "Uasin Gishu": {
+                "Ainabkoi": ["Kaptagat", "Kapsoya", "Olare", "Kipkenyo"],
+                "Kapseret": ["Cheptiret/Kipchoge", "Kipkenyo", "Langas", "Megun"],
+                "Kesses": ["Cheptiret/Kipchoge", "Tulwet/Chuiyat", "Tarakwa"],
+                "Moiben": ["Anabkoi", "Karuna/Moiben", "Kimumu", "Moiben"],
+                "Soy": ["Kapsaret", "Kipsomba", "Soy", "Ziwa"],
+                "Turbo": ["Kamagut", "Munyaka", "Huruma", "Sugoi"]
+            },
+            "Vihiga": {
+                "Emuhaya": ["Central Bunyore", "East Bunyore", "North Bunyore"],
+                "Luanda": ["Emabungo", "Luanda Town", "Wemilabi"],
+                "Sabatia": ["Chavakali", "Izava/Lyaduywa", "North Maragoli", "Wodanga"],
+                "Vihiga": ["Central Maragoli", "Mungoma", "South Maragoli"]
+            },
+            "Wajir": {
+                "Eldas": ["Ademasajide", "Baraza", "Eldas", "Wajir North"],
+                "Tarbaj": ["Alimug", "Buna", "Tarbaj"],
+                "Wajir East": ["Biashara", "Township", "Wagalla"],
+                "Wajir North": ["Bute", "Gurar", "Moyale", "Sabule"],
+                "Wajir South": ["Benane", "Dadaja bula", "Habaswein", "Lagbogol"],
+                "Wajir West": ["Arbajahan", "Hadado/Abakore", "Gither", "Adanyas"]
+            },
+            "West Pokot": {
+                "Kapenguria": ["Batei", "Kapenguria", "Siyoi", "Riwo"],
+                "Kacheliba": ["Kacheliba", "Kodich", "Suam"],
+                "Pokot South": ["Chepareria", "Lomut", "Sook"],
+                "Sigor": ["Cheptulel", "Lelan", "Sekerr", "Wei Wei"]
+            }
+        };
+
+            const countySelect = document.getElementById('training-county');
+            const constituencySelect = document.getElementById('training-constituency');
+            const wardSelect = document.getElementById('training-ward');
+
+            // Populate counties
+            for (const county in kenyaLocations) {
+                const option = document.createElement('option');
+                option.value = county;
+                option.textContent = county;
+                countySelect.appendChild(option);
+            }
+
+            countySelect.addEventListener('change', () => {
+                const selectedCounty = countySelect.value;
+                constituencySelect.innerHTML = '<option value="">Select Constituency</option>';
+                wardSelect.innerHTML = '<option value="">Select Ward</option>';
+                constituencySelect.disabled = true;
+                wardSelect.disabled = true;
+
+                if (selectedCounty && kenyaLocations[selectedCounty]) {
+                    for (const constituency in kenyaLocations[selectedCounty]) {
+                        const option = document.createElement('option');
+                        option.value = constituency;
+                        option.textContent = constituency;
+                        constituencySelect.appendChild(option);
+                    }
+                    constituencySelect.disabled = false;
+                }
+            });
+
+            constituencySelect.addEventListener('change', () => {
+                const selectedCounty = countySelect.value;
+                const selectedConstituency = constituencySelect.value;
+                wardSelect.innerHTML = '<option value="">Select Ward</option>';
+                wardSelect.disabled = true;
+
+                if (selectedCounty && selectedConstituency && kenyaLocations[selectedCounty][selectedConstituency]) {
+                    kenyaLocations[selectedCounty][selectedConstituency].forEach(ward => {
+                        const option = document.createElement('option');
+                        option.value = ward;
+                        option.textContent = ward;
+                        wardSelect.appendChild(option);
+                    });
+                    wardSelect.disabled = false;
+                }
+            });
+
+
+            // --- Form submission logic for other sections (Beehive Sales, Farmer Training, Monitoring, Honey Sales) ---
+
+            document.getElementById('beehive-sales-form').addEventListener('submit', async (e) => {
+    e.preventDefault(); // Prevents the default form submission (page reload)
+
+    const formData = new FormData(e.target); // Get data from the form
+
+    // Extract values from formData and define variables
+   const customerName = document.getElementById('beehive-customerName').value;
+    const itemName = document.getElementById('beehive-type').value;
+    const quantity = parseFloat(document.getElementById('beehive-quantity').value);
+    const price = parseFloat(document.getElementById('beehive-pricePerUnit').value);
+    const saleDate = document.getElementById('beehive-saleDate').value;
+
+    // Create the payload object to send to the server
+    const payload = {
+        user_id: user.id, 
+        customer_name: customerName,
+        item_type: 'Beehive', // Fixed value for this form
+        item_name: itemName,
+        quantity: quantity,
+        price: price,
+        sale_date: saleDate
+    };
+    // Send data to the PHP backend
+    try {
+        const response = await fetch('http://localhost/api/receipts.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload) // Convert JavaScript object to JSON string
+        });
+
+        const result = await response.json(); // Attempt to parse response as JSON
+
+        if (response.ok) { // Check for HTTP success status (200-299)
+            if (result.success) {
+                alert('Beehive sale recorded and receipt saved!');
+                document.getElementById('beehive-sales-form').reset(); // Clear the form
+
+                // OPTIONAL: If you want to immediately update the displayed receipts
+                // after a successful sale, call the fetchReceipts() function here:
+                fetchReceipts(); // Make sure fetchReceipts() is defined and fetches data.
+
+            } else {
+                alert('Error from server: ' + (result.message || 'Unknown error.'));
+            }
+        } else {
+            // Handle non-2xx HTTP responses (e.g., 404 Not Found, 500 Internal Server Error)
+            alert(`Server responded with status ${response.status}: ` + (result.message || 'An error occurred on the server.'));
+        }
+    } catch (error) {
+        console.error('Error saving receipt:', error);
+        alert('Failed to save receipt. Please check your network or server connection.');
+    }
+});
+            document.getElementById('farmer-training-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+
+                try {
+                    const response = await fetch(`${BASE_API_URL}/farmer_training.php`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert(result.message);
+                        e.target.reset();
+                    } else {
+                        alert('Error: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error recording farmer training:', error);
+                    alert('Network error or server issue. Please check console.');
+                }
+            });
+
+            document.getElementById('beehive-monitoring-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+
+                try {
+                    const response = await fetch(`${BASE_API_URL}/beehive_monitoring.php`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert(result.message);
+                        e.target.reset();
+                    } else {
+                        alert('Error: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error recording beehive monitoring:', error);
+                    alert('Network error or server issue. Please check console.');
+                }
+            });
+
+            document.getElementById('honey-sales-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const customerName = document.getElementById('honey-customerName').value;
+    const itemName = document.getElementById('honey-type').value;
+    const quantity = parseFloat(document.getElementById('honey-quantityKg').value);
+    const price = parseFloat(document.getElementById('honey-pricePerKg').value);
+    const saleDate = document.getElementById('honey-saleDate').value;
+
+    const payload = {
+        user_id: user.id,
+        customer_name: customerName,
+        item_type: 'Honey',
+        item_name: itemName,
+        quantity: quantity,
+        price: price,
+        sale_date: saleDate
+    };
+
+    try {
+        const response = await fetch('http://localhost/api/receipts.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert('Honey sale recorded and receipt saved!');
+            document.getElementById('honey-sales-form').reset();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Error saving receipt:', error);
+        alert('Failed to save receipt. Please check your network or server.');
+    }
+});
+
+
+            // --- Receipts Fetch and Render ---
+            async function fetchAndRenderReceipts() {
+    try {
+       const response = await fetch(`http://localhost/api/receipts.php?user_id=${user.id}`);
+        const result = await response.json();
+
+        const container = document.getElementById('receipts-container');
+        container.innerHTML = ''; // Clear old content
+
+        if (result.success && result.receipts.length > 0) {
+            result.receipts.forEach(receipt => {
+                const card = document.createElement('div');
+                card.classList.add('receipt-card');
+
+                card.innerHTML = `
+    <div class="printable-receipt">
+        <h3>${receipt.customer_name}</h3>
+        <p><strong>Type:</strong> ${receipt.item_type}</p>
+        <div class="details-section">
+            <p><span class="font-semibold">Item:</span> ${receipt.item_name}</p>
+            <p><span class="font-semibold">Quantity:</span> ${receipt.quantity}</p>
+            <p><span class="font-semibold">Unit Price:</span> Ksh ${receipt.price}</p>
+            <p class="total-amount">Total: Ksh ${receipt.total}</p>
+            <p><span class="font-semibold">Date:</span> ${receipt.sale_date}</p>
+        </div>
+        <div class="thank-you-note">Thank you for your purchase!</div>
+    </div>
+    <button class="submit-button" onclick="printReceipt(this)">Print Receipt</button>
+`;
+
+
+                container.appendChild(card);
+            });
+        } else {
+            container.innerHTML = `<p class="text-center" style="grid-column: 1 / -1; color: #4B5563;">No receipts found.</p>`;
+        }
+    } catch (error) {
+        console.error('Error fetching receipts:', error);
+        const container = document.getElementById('receipts-container');
+        container.innerHTML = `<p class="text-center" style="color: red;">Network error fetching receipts. Check server status.</p>`;
+    }
+}
+
+        });
+        document.getElementById('admin-login-btn').addEventListener('click', function (e) {
+        e.preventDefault(); // Prevent form submission if button is inside form
+        window.location.href = 'admin_login.html'; // Redirect to admin login page
+    });
+    </script>
+</body>
+<footer>
+    <p> &copy Honey Bee Management System 2025 || All Rights Reserved.</p>
+</footer>
+</html>
